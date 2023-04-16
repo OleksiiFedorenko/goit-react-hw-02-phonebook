@@ -1,29 +1,25 @@
-const Contacts = ({ contacts, filter, onFilter }) => {
+import ContactsItem from './ContactsItem';
+
+const Contacts = ({ contacts, filter, onDelete }) => {
   const normalizedFilter = filter.toLowerCase();
 
+  function filterByName(contact) {
+    return contact.name.toLowerCase().includes(normalizedFilter);
+  }
+
   return (
-    <>
-      <label>
-        Find contacts by name
-        <input type="text" value={filter} onChange={onFilter} />
-      </label>
-      <ul>
-        {contacts
-          .filter(contact =>
-            contact.name.toLowerCase().includes(normalizedFilter)
-          )
-          .map(({ id, name, number }) => (
-            <li key={id}>
-              {name}: {number}
-            </li>
-          ))}
-      </ul>
-    </>
+    <ul>
+      {contacts.filter(filterByName).map(({ id, name, number }) => (
+        <ContactsItem
+          key={id}
+          id={id}
+          name={name}
+          number={number}
+          toDelete={onDelete}
+        />
+      ))}
+    </ul>
   );
 };
-
-// function filterByName(contact) {
-//   return contact.name.toLowerCase().includes(normalizedFilter);
-// }
 
 export default Contacts;

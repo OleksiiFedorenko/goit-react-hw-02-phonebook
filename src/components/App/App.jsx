@@ -2,8 +2,9 @@ import { Component } from 'react';
 import { nanoid } from 'nanoid';
 import { Container } from './App.styled';
 import MainTitle from 'components/MainTitle/MainTitle';
-import Section from 'components/Section/Section';
-import AddContact from 'components/AddContact/AddContact';
+import SecondaryTitle from 'components/SecondaryTitle/SecondaryTitle';
+import NewContact from 'components/NewContact/NewContact';
+import Filter from 'components/Filter/Filter';
 import Contacts from 'components/Contacts/Contacts';
 
 class App extends Component {
@@ -23,6 +24,10 @@ class App extends Component {
     e.preventDefault();
     const { name, number } = e.target;
 
+    if (this.state.contacts.some(contact => contact.name === name.value)) {
+      return alert(`${name.value} is already in contacts.`);
+    }
+
     const newContact = {
       id: nanoid(),
       name: name.value,
@@ -31,6 +36,16 @@ class App extends Component {
 
     this.setState({ contacts: [...this.state.contacts, newContact] });
     e.target.reset();
+  };
+
+  deleteContact = id => {
+    const indexToDelete = this.state.contacts.findIndex(
+      contact => contact.id === id
+    );
+
+    if (indexToDelete < 0) return;
+    const updatedContacts = this.state.contacts.splice(indexToDelete, 1);
+    this.setState(updatedContacts);
   };
 
   onFilter = e => {
@@ -43,16 +58,15 @@ class App extends Component {
     return (
       <Container>
         <MainTitle title="Phonebook" />
-        <Section title="Add new">
-          <AddContact addContact={this.addContact} />
-        </Section>
-        <Section title="Contacts">
-          <Contacts
-            contacts={this.state.contacts}
-            filter={this.state.filter}
-            onFilter={this.onFilter}
-          />
-        </Section>
+        <NewContact addContact={this.addContact} />
+        <SecondaryTitle title="Contacts" />
+        <Filter filter={this.state.filter} onFilter={this.onFilter} />
+        <Contacts
+          contacts={this.state.contacts}
+          filter={this.state.filter}
+          onFilter={this.onFilter}
+          onDelete={this.deleteContact}
+        />
       </Container>
     );
   }
