@@ -1,4 +1,6 @@
+import PropTypes from 'prop-types';
 import ContactsItem from './ContactsItem';
+import { ContactList } from './Contacts.styled';
 
 const Contacts = ({ contacts, filter, onDelete }) => {
   const normalizedFilter = filter.toLowerCase();
@@ -8,18 +10,29 @@ const Contacts = ({ contacts, filter, onDelete }) => {
   }
 
   return (
-    <ul>
+    <ContactList>
       {contacts.filter(filterByName).map(({ id, name, number }) => (
         <ContactsItem
           key={id}
-          id={id}
           name={name}
           number={number}
-          toDelete={onDelete}
+          onDelete={onDelete}
         />
       ))}
-    </ul>
+    </ContactList>
   );
+};
+
+Contacts.propTypes = {
+  contacts: PropTypes.arrayOf(
+    PropTypes.exact({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      number: PropTypes.string.isRequired,
+    })
+  ),
+  filter: PropTypes.string.isRequired,
+  onDelete: PropTypes.func.isRequired,
 };
 
 export default Contacts;

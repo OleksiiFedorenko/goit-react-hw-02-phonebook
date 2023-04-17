@@ -1,33 +1,66 @@
-const AddContact = ({ addContact }) => {
+import PropTypes from 'prop-types';
+import { Formik } from 'formik';
+import * as yup from 'yup';
+import {
+  ContactForm,
+  Label,
+  Input,
+  FormError,
+  Button,
+} from './NewContact.styled';
+
+const nameRegex =
+  /^[a-zA-Zа-яґєіїА-ЯҐЄІЇ]+(([' -][a-zA-Zа-яґєіїА-ЯҐЄІЇ ])?[a-zA-Zа-яґєіїА-ЯҐЄІЇ]*)*$/;
+const nameWarningMessage =
+  "Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan";
+const numberRegex =
+  /\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}/;
+const numberWarningMessage =
+  'Phone number must be at least 5 digits and can contain spaces, dashes, parentheses and can start with +';
+
+const validationSchema = yup.object().shape({
+  name: yup
+    .string()
+    .matches(nameRegex, nameWarningMessage)
+    .required('Please add name'),
+  number: yup
+    .string()
+    .matches(numberRegex, numberWarningMessage)
+    .required('Please add number'),
+});
+
+const NewContact = ({ addContact }) => {
+  const handleSubmit = (values, { resetForm }) => {
+    addContact(values, resetForm);
+  };
+
   return (
-    <form onSubmit={addContact}>
-      <label>
-        Name
-        <input
-          type="text"
-          name="name"
-          pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-          title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-          required
-        />
-      </label>
-      <br />
+    <Formik
+      initialValues={{ name: '', number: '' }}
+      validationSchema={validationSchema}
+      onSubmit={handleSubmit}
+    >
+      <ContactForm>
+        <Label>
+          Name
+          <Input type="text" name="name" />
+          <FormError name="name" component="div" />
+        </Label>
 
-      <label>
-        Number
-        <input
-          type="tel"
-          name="number"
-          pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-          title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
-          required
-        />
-      </label>
+        <Label>
+          Number
+          <Input type="tel" name="number" />
+          <FormError name="number" component="div" />
+        </Label>
 
-      <br />
-      <button type="submit">Add contact</button>
-    </form>
+        <Button type="submit">Add contact</Button>
+      </ContactForm>
+    </Formik>
   );
 };
 
-export default AddContact;
+NewContact.propTypes = {
+  addContact: PropTypes.func.isRequired,
+};
+
+export default NewContact;

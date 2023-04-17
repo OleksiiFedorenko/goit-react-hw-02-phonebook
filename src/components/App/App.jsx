@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import { nanoid } from 'nanoid';
 import { Container } from './App.styled';
 import MainTitle from 'components/MainTitle/MainTitle';
@@ -20,32 +21,33 @@ class App extends Component {
     number: '',
   };
 
-  addContact = e => {
-    e.preventDefault();
-    const { name, number } = e.target;
+  addContact = (contactObj, resetForm) => {
+    const { name, number } = contactObj;
 
-    if (this.state.contacts.some(contact => contact.name === name.value)) {
-      return alert(`${name.value} is already in contacts.`);
+    if (this.state.contacts.some(contact => contact.name === name)) {
+      return Notify.warning(`${name} is already in contacts.`);
     }
 
     const newContact = {
       id: nanoid(),
-      name: name.value,
-      number: number.value,
+      name,
+      number,
     };
 
     this.setState({ contacts: [...this.state.contacts, newContact] });
-    e.target.reset();
+    Notify.success(`${name} is added to contacts.`);
+    resetForm();
   };
 
-  deleteContact = id => {
+  deleteContact = name => {
     const indexToDelete = this.state.contacts.findIndex(
-      contact => contact.id === id
+      contact => contact.name === name
     );
 
     if (indexToDelete < 0) return;
     const updatedContacts = this.state.contacts.splice(indexToDelete, 1);
     this.setState(updatedContacts);
+    Notify.failure(`${name} was removed from contacts.`);
   };
 
   onFilter = e => {
@@ -53,8 +55,6 @@ class App extends Component {
   };
 
   render() {
-    console.log(this.state.contacts);
-
     return (
       <Container>
         <MainTitle title="Phonebook" />
