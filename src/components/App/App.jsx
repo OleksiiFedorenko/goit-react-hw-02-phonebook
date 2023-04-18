@@ -2,11 +2,10 @@ import { Component } from 'react';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import { nanoid } from 'nanoid';
 import { Container } from './App.styled';
-import MainTitle from 'components/MainTitle/MainTitle';
-import SecondaryTitle from 'components/SecondaryTitle/SecondaryTitle';
-import NewContact from 'components/NewContact/NewContact';
+import Title from 'components/Title/Title';
+import NewContactForm from 'components/NewContactForm/NewContactForm';
 import Filter from 'components/Filter/Filter';
-import Contacts from 'components/Contacts/Contacts';
+import ContactList from 'components/ContactList/ContactList';
 
 class App extends Component {
   state = {
@@ -17,16 +16,18 @@ class App extends Component {
       { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
     ],
     filter: '',
-    name: '',
-    number: '',
   };
 
-  addContact = (contactObj, resetForm) => {
+  addContact = contactObj => {
     const { name, number } = contactObj;
+    const normalizedName = name.toLowerCase();
 
-    if (this.state.contacts.some(contact => contact.name === name)) {
+    if (
+      this.state.contacts.some(
+        contact => contact.name.toLowerCase() === normalizedName
+      )
+    )
       return Notify.warning(`${name} is already in contacts.`);
-    }
 
     const newContact = {
       id: nanoid(),
@@ -36,17 +37,15 @@ class App extends Component {
 
     this.setState({ contacts: [...this.state.contacts, newContact] });
     Notify.success(`${name} is added to contacts.`);
-    resetForm();
+    return true;
   };
 
-  deleteContact = name => {
-    const indexToDelete = this.state.contacts.findIndex(
-      contact => contact.name === name
+  deleteContact = (id, name) => {
+    const updatedContacts = this.state.contacts.filter(
+      contact => contact.id !== id
     );
 
-    if (indexToDelete < 0) return;
-    const updatedContacts = this.state.contacts.splice(indexToDelete, 1);
-    this.setState(updatedContacts);
+    this.setState({ contacts: updatedContacts });
     Notify.failure(`${name} was removed from contacts.`);
   };
 
@@ -54,17 +53,26 @@ class App extends Component {
     this.setState({ filter: e.target.value });
   };
 
+  filterContacts = () => {
+    const { contacts, filter } = this.state;
+    const normalizedFilter = filter.toLowerCase();
+
+    return contacts.filter(contact =>
+      contact.name.toLowerCase().includes(normalizedFilter)
+    );
+  };
+
   render() {
+    const filteredContacts = this.filterContacts();
+
     return (
       <Container>
-        <MainTitle title="Phonebook" />
-        <NewContact addContact={this.addContact} />
-        <SecondaryTitle title="Contacts" />
+        <Title mainTitle="Phonebook" />
+        <NewContactForm addContact={this.addContact} />
+        <Title title="Contacts" />
         <Filter filter={this.state.filter} onFilter={this.onFilter} />
-        <Contacts
-          contacts={this.state.contacts}
-          filter={this.state.filter}
-          onFilter={this.onFilter}
+        <ContactList
+          contacts={filteredContacts}
           onDelete={this.deleteContact}
         />
       </Container>

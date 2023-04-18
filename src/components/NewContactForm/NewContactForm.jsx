@@ -7,7 +7,7 @@ import {
   Input,
   FormError,
   Button,
-} from './NewContact.styled';
+} from './NewContactForm.styled';
 
 const nameRegex =
   /^[a-zA-Zа-яґєіїА-ЯҐЄІЇ]+(([' -][a-zA-Zа-яґєіїА-ЯҐЄІЇ ])?[a-zA-Zа-яґєіїА-ЯҐЄІЇ]*)*$/;
@@ -29,9 +29,10 @@ const validationSchema = yup.object().shape({
     .required('Please add number'),
 });
 
-const NewContact = ({ addContact }) => {
+const NewContactForm = ({ addContact }) => {
   const handleSubmit = (values, { resetForm }) => {
-    addContact(values, resetForm);
+    const isSuccesfullyAdded = addContact(values);
+    if (isSuccesfullyAdded) resetForm();
   };
 
   return (
@@ -59,8 +60,8 @@ const NewContact = ({ addContact }) => {
   );
 };
 
-NewContact.propTypes = {
+NewContactForm.propTypes = {
   addContact: PropTypes.func.isRequired,
 };
 
-export default NewContact;
+export default NewContactForm;
