@@ -6,6 +6,7 @@ import Title from 'components/Title/Title';
 import NewContactForm from 'components/NewContactForm/NewContactForm';
 import Filter from 'components/Filter/Filter';
 import ContactList from 'components/ContactList/ContactList';
+import NoContacts from 'components/NoContacts/NoContacts';
 
 class App extends Component {
   state = {
@@ -64,6 +65,7 @@ class App extends Component {
 
   render() {
     const filteredContacts = this.filterContacts();
+    const isAnyContacts = Boolean(this.state.contacts.length);
 
     return (
       <Container>
@@ -71,10 +73,17 @@ class App extends Component {
         <NewContactForm addContact={this.addContact} />
         <Title title="Contacts" />
         <Filter filter={this.state.filter} onFilter={this.onFilter} />
-        <ContactList
-          contacts={filteredContacts}
-          onDelete={this.deleteContact}
-        />
+
+        {isAnyContacts && filteredContacts.length ? (
+          <ContactList
+            contacts={filteredContacts}
+            onDelete={this.deleteContact}
+          />
+        ) : (
+          <NoContacts
+            message={isAnyContacts ? `No contacts found` : `No contacts yet`}
+          />
+        )}
       </Container>
     );
   }
